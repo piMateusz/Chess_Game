@@ -151,14 +151,16 @@ class Queen(ChessPiece):
         self.valid_positions_dict.update(valid_positions_dict_straight)
 
 
-""" This function takes 3 input arguments:
-        list: List[List[position_x, position_y]]        #list of lists which contains x, y positions
-        x: x_position
-        y: y_position
-        and have 1 output:
+""" 
+    This function takes 3 input arguments:
+        list:      list of lists which contains x, y positions
+        x:         x_position
+        y:         y_position
+    And have 1 output:
         new_list which is sorted input list
-        new_list is sorted from elements with the lowest distance from its position_x, position_y 
-        to input arguments x, y to this with the biggest distance 
+        
+    new_list is sorted from elements with the lowest distance from its position_x, position_y 
+        to input arguments x, y, to this with the biggest distance 
 """
 
 

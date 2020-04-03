@@ -2,8 +2,6 @@ from figures import rows, cols, cell_size, Pawn, Horse, Bishop, Queen, King, Roo
 import pygame
 import string
 
-# TODO check this type warning
-
 
 class Board:
     def __init__(self, color):

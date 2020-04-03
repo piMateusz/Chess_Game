@@ -30,7 +30,7 @@ class Chess:
     """ handling castling here """
 
     def check_for_possible_castling(self):
-        king_x, king_y = self.get_king_pos('my_king')
+        king_x, king_y = self.get_my_king_pos()
         my_king = self.board[king_y][king_x]
 
         for key in my_king.valid_positions_dict:
@@ -222,7 +222,7 @@ class Chess:
     def set_move_that_confirm_king_safety(self, first_click_x, first_click_y):
         first_x_temp, first_y_temp = first_click_x, first_click_y
         clicked_figure = self.board[first_click_y][first_click_x]
-        king_x, king_y = self.get_king_pos('my_king')
+        king_x, king_y = self.get_my_king_pos()
         previous_figure = 0
         last_pos = []
         for key in clicked_figure.valid_positions_dict:
@@ -237,7 +237,7 @@ class Chess:
                 self.board[new_y][new_x] = clicked_figure
                 first_click_x, first_click_y = new_x, new_y
                 if clicked_figure.__repr__() == 'King':
-                    king_x, king_y = self.get_king_pos('my_king')
+                    king_x, king_y = self.get_my_king_pos()
                 for row in self.board:
                     for figure in row:
                         if figure:
@@ -389,32 +389,20 @@ class Chess:
                     else:
                         self.new_x, self.new_y = -2, -2
 
-    """ 
-        get_king_pos(self, whose)
-        whose parameter can take strings above:
-        'my_king' -> get position of player's king that current turn is
-        'enemy_king' -> get position of player's king that current turn was/will be next
-    """
-
-    def get_king_pos(self, whose):
+    def get_my_king_pos(self):
         king_x, king_y = -1, -1
         for row in range(rows):
             for col in range(cols):
                 figure = self.board[row][col]
                 if figure:
                     if figure.__repr__() == 'King':
-                        if whose == 'my_king':
-                            if figure.color == self.turn_color:
-                                king_x = col
-                                king_y = row
-                        elif whose == 'enemy_king':
-                            if figure.color != self.turn_color:
-                                king_x = col
-                                king_y = row
+                        if figure.color == self.turn_color:
+                            king_x = col
+                            king_y = row
         return king_x, king_y
 
     def check_for_check(self):
-        my_king_x, my_king_y = self.get_king_pos('my_king')
+        my_king_x, my_king_y = self.get_my_king_pos()
         for row in self.board:
             for figure in row:
                 if figure:
@@ -431,7 +419,6 @@ class Chess:
                                             self.check_path_dict[key].append(check_path_position)
                                     self.is_check = True
 
-    # FIXME
     def check_for_checkmate(self):
         for row in self.board:
             for figure in row:
