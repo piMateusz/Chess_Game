@@ -1,4 +1,3 @@
-from typing import List
 from figures import screen_width, screen_height, cell_size, rows, cols
 from figures import Bishop, Rook, Queen, Horse
 from buttons import EndGameButton, FigureButton
@@ -6,15 +5,6 @@ from board import Board
 import pygame
 
 # Some icons are made by "https://www.flaticon.com/authors/pixel-perfect" from "https://www.flaticon.com/"
-
-# screen_width = 640
-# screen_height = 640
-# rows = 8
-# cols = 8
-# cell_size = screen_width/8   # 80
-
-# TODO
-#  add type hinting where necessary and clean up this mess
 
 pygame.init()
 
@@ -27,18 +17,17 @@ move_sound = pygame.mixer.Sound('sounds/move_sound.wav')
 class Chess:
     def __init__(self, board):
         self.board_object = board
-        self.board = board.chess_board
-        self.turn_color = 'white'         # white starts
+        self.board = board.chess_board      # 2D table of figures
+        self.turn_color = 'white'           # white starts
         self.first_click_x = -1
         self.first_click_y = -1
         self.new_x = -2
         self.new_y = -2
         self.is_check = False
-        # variables needed when check
-        # it is used to check whether we can "defend" our king with other chess piece
-        self.check_path_dict = {}          # dict of positions (path) that is between player's king
-        # and opponent's figure that checked player's king, convention -> (figure.x, figure.y)  :   List of positions
-        self.is_castled = False             # to check if player did not castle yet
+        # dict of positions (path) that is between player's king and opponent's queen/bishop/rook:
+        self.check_path_dict = {}
+
+    """ handling castling here """
 
     def check_for_possible_castling(self):
         king_x, king_y = self.get_king_pos('my_king')
@@ -96,14 +85,16 @@ class Chess:
         if self.first_click_x + 2 == self.new_x:
             self.board[self.first_click_y][self.first_click_x + 1] = self.board[self.first_click_y][self.first_click_x + 3]
             self.board[self.first_click_y][self.first_click_x + 3] = 0
-            self.board[self.first_click_y][self.first_click_x + 1].x = (self.first_click_x + 1) * cell_size
-            self.board[self.first_click_y][self.first_click_x + 1].y = self.first_click_y * cell_size
+            self.board[self.first_click_y][self.first_click_x + 1].x = self.first_click_x + 1
+            self.board[self.first_click_y][self.first_click_x + 1].y = self.first_click_y
 
         if self.first_click_x - 2 == self.new_x:
             self.board[self.first_click_y][self.first_click_x - 1] = self.board[self.first_click_y][self.first_click_x - 4]
             self.board[self.first_click_y][self.first_click_x - 4] = 0
-            self.board[self.first_click_y][self.first_click_x - 1].x = (self.first_click_x - 1) * cell_size
-            self.board[self.first_click_y][self.first_click_x - 1].y = self.first_click_y * cell_size
+            self.board[self.first_click_y][self.first_click_x - 1].x = self.first_click_x - 1
+            self.board[self.first_click_y][self.first_click_x - 1].y = self.first_click_y
+
+    """ handling pawn transition here """
 
     @ staticmethod
     def choose_pawn_transition_figure(x, y, color):
@@ -160,8 +151,8 @@ class Chess:
                     if figure.is_moved:
                         if figure.__repr__() == 'Pawn':
                             if figure.color == 'white':
-                                if int(figure.y//cell_size) == 0:
-                                    img = self.choose_pawn_transition_figure(figure.x, figure.y, figure.color)
+                                if figure.y == 0:
+                                    img = self.choose_pawn_transition_figure(figure.x * cell_size, figure.y * cell_size, figure.color)
                                     if img == 'img/white_queen.png':
                                         chosen_figure = Queen(figure.x, figure.y, cell_size, cell_size,
                                                               'img/white_queen.png', 'white')
@@ -175,12 +166,12 @@ class Chess:
                                         chosen_figure = Horse(figure.x, figure.y, cell_size, cell_size,
                                                               'img/white_horse.png', 'white')
                                     chosen_figure.is_moved = True
-                                    self.board[int(figure.y//cell_size)][int(figure.x//cell_size)] = chosen_figure
+                                    self.board[figure.y][figure.x] = chosen_figure
                                 else:
-                                    self.board[int(figure.y // cell_size)][int(figure.x // cell_size)] = figure
+                                    self.board[figure.y][figure.x] = figure
                             if figure.color == 'black':
-                                if int(figure.y//cell_size) == 7:
-                                    img = self.choose_pawn_transition_figure(figure.x, figure.y, figure.color)
+                                if figure.y == 7:
+                                    img = self.choose_pawn_transition_figure(figure.x * cell_size, figure.y * cell_size, figure.color)
                                     if img == 'img/black_queen.png':
                                         chosen_figure = Queen(figure.x, figure.y, cell_size, cell_size,
                                                               'img/black_queen.png', 'black')
@@ -194,11 +185,11 @@ class Chess:
                                         chosen_figure = Horse(figure.x, figure.y, cell_size, cell_size,
                                                               'img/black_horse.png', 'black')
                                     chosen_figure.is_moved = True
-                                    self.board[int(figure.y // cell_size)][int(figure.x // cell_size)] = chosen_figure
+                                    self.board[figure.y][figure.x] = chosen_figure
                                 else:
-                                    self.board[int(figure.y // cell_size)][int(figure.x // cell_size)] = figure
+                                    self.board[figure.y][figure.x] = figure
                         else:
-                            self.board[int(figure.y//cell_size)][int(figure.x//cell_size)] = figure
+                            self.board[figure.y][figure.x] = figure
                         self.board[self.first_click_y][self.first_click_x] = 0
                         self.change_turn()
 
@@ -228,15 +219,6 @@ class Chess:
                         x, y = position[0], position[1]
                         pygame.draw.circle(win, (255, 0, 0), (int(x*cell_size + cell_size//2), int(y*cell_size + cell_size//2)), 5)
 
-    def check_move_validity(self, first_click_x, first_click_y, second_click_x, second_click_y):
-        figure = self.board[first_click_y][first_click_x]
-        for key in figure.valid_positions_dict:
-            list_pos = figure.valid_positions_dict[key]
-            for pos in list_pos:
-                if second_click_x == pos[0] and second_click_y == pos[1]:
-                    return True
-        return False
-
     def set_move_that_confirm_king_safety(self, first_click_x, first_click_y):
         first_x_temp, first_y_temp = first_click_x, first_click_y
         clicked_figure = self.board[first_click_y][first_click_x]
@@ -260,14 +242,14 @@ class Chess:
                     for figure in row:
                         if figure:
                             if figure.color != self.turn_color:
-                                self.set_move_validity(int(figure.x // cell_size),
-                                                       int(figure.y // cell_size), figure.color)
+                                self.set_move_validity(figure.x,
+                                                       figure.y, figure.color)
                                 for figure_key in figure.valid_positions_dict:
                                     pos_list = figure.valid_positions_dict[figure_key]
                                     for pos in pos_list:
                                         if pos[0] == king_x and pos[1] == king_y:
-                                            if self.check_move_validity(int(figure.x // cell_size),
-                                                                        int(figure.y // cell_size), king_x, king_y):
+                                            if self.check_move_validity(figure.x,
+                                                                        figure.y, king_x, king_y):
                                                 if position in temp:
                                                     temp.remove(position)
 
@@ -289,7 +271,7 @@ class Chess:
                             for position in position_list:
                                 for check_key in self.check_path_dict:
                                     if figure.__repr__() == 'King':
-                                        self.set_move_that_confirm_king_safety(int(figure.x//cell_size), int(figure.y//cell_size))
+                                        self.set_move_that_confirm_king_safety(figure.x, figure.y)
                                     else:
                                         if len(self.check_path_dict) > 1:
                                             temp.remove(position)
@@ -347,6 +329,15 @@ class Chess:
 
             figure.valid_positions_dict[key] = valid_path_list
 
+    def check_move_validity(self, first_click_x, first_click_y, second_click_x, second_click_y):
+        figure = self.board[first_click_y][first_click_x]
+        for key in figure.valid_positions_dict:
+            list_pos = figure.valid_positions_dict[key]
+            for pos in list_pos:
+                if second_click_x == pos[0] and second_click_y == pos[1]:
+                    return True
+        return False
+
     def move(self):
         keys = pygame.mouse.get_pressed()
         if keys[0]:
@@ -381,13 +372,12 @@ class Chess:
                                 self.end_game(win)
                         else:
                             self.set_move_that_confirm_king_safety(self.first_click_x, self.first_click_y)
-                            self.check_for_possible_castling()
+                        self.check_for_possible_castling()
                 else:
                     self.new_x, self.new_y = -2, -2
 
                 if self.new_x != -2:
                     if self.check_move_validity(self.first_click_x, self.first_click_y, self.new_x, self.new_y):
-                        # TODO CHECK FOR CASTLING AND IMPLEMENT APPROPRIATE BEHAVIOR
                         if figure.__repr__() == 'King':
                             self.do_castling()
 
@@ -399,9 +389,12 @@ class Chess:
                     else:
                         self.new_x, self.new_y = -2, -2
 
-    # whose parameter can take strings above:
-    # 'my_king' -> get position of player's king that current turn is
-    # 'enemy_king' -> get position of player's king that current turn was/will be next
+    """ 
+        get_king_pos(self, whose)
+        whose parameter can take strings above:
+        'my_king' -> get position of player's king that current turn is
+        'enemy_king' -> get position of player's king that current turn was/will be next
+    """
 
     def get_king_pos(self, whose):
         king_x, king_y = -1, -1
@@ -426,15 +419,16 @@ class Chess:
             for figure in row:
                 if figure:
                     if figure.color != self.turn_color:
-                        self.set_move_validity(int(figure.x // cell_size), int(figure.y // cell_size), figure.color)
+                        self.set_move_validity(figure.x, figure.y, figure.color)
                         for key in figure.valid_positions_dict:
                             pos_list = figure.valid_positions_dict[key]
                             for position in pos_list:
                                 if my_king_x == position[0] and my_king_y == position[1]:
-                                    key = (int(figure.x // cell_size), int(figure.y // cell_size))
+                                    key = (figure.x, figure.y)
                                     self.check_path_dict[key] = []
-                                    for check_path_position in pos_list:
-                                        self.check_path_dict[key].append(check_path_position)
+                                    if figure.__repr__() in ['Queen', 'Rook', 'Bishop']:
+                                        for check_path_position in pos_list:
+                                            self.check_path_dict[key].append(check_path_position)
                                     self.is_check = True
 
     # FIXME

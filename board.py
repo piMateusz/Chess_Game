@@ -14,45 +14,45 @@ class Board:
         for row in range(rows):
             for col in range(cols):
                 if row == 1:
-                    pawn = Pawn(col*cell_size, row*cell_size, cell_size, cell_size, 'img/black_pawn.png', 'black')
+                    pawn = Pawn(col, row, cell_size, cell_size, 'img/black_pawn.png', 'black')
                     self.chess_board[row][col] = pawn
 
                 elif row == 6:
-                    pawn = Pawn(col * cell_size, row * cell_size, cell_size, cell_size, 'img/white_pawn.png', 'white')
+                    pawn = Pawn(col, row, cell_size, cell_size, 'img/white_pawn.png', 'white')
                     self.chess_board[row][col] = pawn
 
                 elif row == 0:
                     if col == 1 or col == 6:
-                        horse = Horse(col*cell_size, row*cell_size, cell_size, cell_size, 'img/black_horse.png', 'black')
+                        horse = Horse(col, row, cell_size, cell_size, 'img/black_horse.png', 'black')
                         self.chess_board[row][col] = horse
                     if col == 2 or col == 5:
-                        bishop = Bishop(col*cell_size, row*cell_size, cell_size, cell_size, 'img/black_bishop.png', 'black')
+                        bishop = Bishop(col, row, cell_size, cell_size, 'img/black_bishop.png', 'black')
                         self.chess_board[row][col] = bishop
                     if col == 3:
-                        queen = Queen(col*cell_size, row*cell_size, cell_size, cell_size, 'img/black_queen.png', 'black')
+                        queen = Queen(col, row, cell_size, cell_size, 'img/black_queen.png', 'black')
                         self.chess_board[row][col] = queen
                     if col == 4:
-                        king = King(col*cell_size, row*cell_size, cell_size, cell_size, 'img/black_king.png', 'black')
+                        king = King(col, row, cell_size, cell_size, 'img/black_king.png', 'black')
                         self.chess_board[row][col] = king
                     if col == 0 or col == 7:
-                        rook = Rook(col*cell_size, row*cell_size, cell_size, cell_size, 'img/black_rook.png', 'black')
+                        rook = Rook(col, row, cell_size, cell_size, 'img/black_rook.png', 'black')
                         self.chess_board[row][col] = rook
 
                 elif row == 7:
                     if col == 1 or col == 6:
-                        horse = Horse(col*cell_size, row*cell_size, cell_size, cell_size, 'img/white_horse.png', 'white')
+                        horse = Horse(col, row, cell_size, cell_size, 'img/white_horse.png', 'white')
                         self.chess_board[row][col] = horse
                     if col == 2 or col == 5:
-                        bishop = Bishop(col*cell_size, row*cell_size, cell_size, cell_size, 'img/white_bishop.png', 'white')
+                        bishop = Bishop(col, row, cell_size, cell_size, 'img/white_bishop.png', 'white')
                         self.chess_board[row][col] = bishop
                     if col == 3:
-                        queen = Queen(col*cell_size, row*cell_size, cell_size, cell_size, 'img/white_queen.png', 'white')
+                        queen = Queen(col, row, cell_size, cell_size, 'img/white_queen.png', 'white')
                         self.chess_board[row][col] = queen
                     if col == 4:
-                        king = King(col*cell_size, row*cell_size, cell_size, cell_size, 'img/white_king.png', 'white')
+                        king = King(col, row, cell_size, cell_size, 'img/white_king.png', 'white')
                         self.chess_board[row][col] = king
                     if col == 0 or col == 7:
-                        rook = Rook(col*cell_size, row*cell_size, cell_size, cell_size, 'img/white_rook.png', 'white')
+                        rook = Rook(col, row, cell_size, cell_size, 'img/white_rook.png', 'white')
                         self.chess_board[row][col] = rook
 
                 else:

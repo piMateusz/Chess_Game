@@ -29,14 +29,14 @@ class ChessPiece(ABC):
         pass
 
     def move(self, new_x, new_y):
-        self.x, self.y = int(new_x * cell_size), int(new_y * cell_size)
+        self.x, self.y = new_x, new_y
         self.is_moved = True
         if not self.was_moved:
             self.was_moved = True
 
     def draw(self, win):
-        win.blit(self.image, (self.x + self.width // 2 - self.image.get_width() // 2,
-                              self.y + self.height // 2 - self.image.get_height() // 2))
+        win.blit(self.image, (self.x*cell_size + self.width // 2 - self.image.get_width() // 2,
+                              self.y*cell_size + self.height // 2 - self.image.get_height() // 2))
 
 
 class Pawn(ChessPiece):
@@ -44,7 +44,7 @@ class Pawn(ChessPiece):
         return "Pawn"
 
     def valid_positions(self):
-        x, y = int(self.x // cell_size), int(self.y // cell_size)
+        x, y = self.x, self.y
         self.valid_positions_dict = {'up': [], 'up-right': [], 'up-left': [], 'double-up': []}
         if self.color == 'white':
             if y == 6:
@@ -71,7 +71,7 @@ class Horse(ChessPiece):
         return "Horse"
 
     def valid_positions(self):
-        x, y = int(self.x // cell_size), int(self.y // cell_size)
+        x, y = self.x, self.y
         self.valid_positions_dict = {'all_moves': []}
         if x - 2 >= 0:
             if y + 1 < rows:
@@ -103,7 +103,7 @@ class King(ChessPiece):
         return "King"
 
     def valid_positions(self):
-        x, y = int(self.x // cell_size), int(self.y // cell_size)
+        x, y = self.x, self.y
         self.valid_positions_dict = {'short-castling': [], 'long-castling': [], 'normal_moves': []}
         for j in range(-1, 2):
             for k in range(-1, 2):
@@ -126,7 +126,7 @@ class Rook(ChessPiece):
         return "Rook"
 
     def valid_positions(self):
-        x, y = int(self.x // cell_size), int(self.y // cell_size)
+        x, y = self.x, self.y
         self.valid_positions_dict = get_valid_pos_straight(x, y)
 
 
@@ -135,7 +135,7 @@ class Bishop(ChessPiece):
         return "Bishop"
 
     def valid_positions(self):
-        x, y = int(self.x // cell_size), int(self.y // cell_size)
+        x, y = self.x, self.y
         self.valid_positions_dict = get_valid_pos_cross(x, y)
 
 
@@ -144,7 +144,7 @@ class Queen(ChessPiece):
         return "Queen"
 
     def valid_positions(self):
-        x, y = int(self.x // cell_size), int(self.y // cell_size)
+        x, y = self.x, self.y
         valid_positions_dict_straight = get_valid_pos_straight(x, y)
         self.valid_positions_dict = get_valid_pos_cross(x, y)
         # all keys are different so simply
