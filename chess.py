@@ -1,24 +1,26 @@
-from figures import screen_width, screen_height, cell_size, rows, cols
+from figures import SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE, ROWS, COLS
 from figures import Bishop, Rook, Queen, Horse
 from buttons import EndGameButton, FigureButton
 from board import Board
 import pygame
+import os
 
 # Some icons are made by "https://www.flaticon.com/authors/pixel-perfect" from "https://www.flaticon.com/"
 
 pygame.init()
 
-win = pygame.display.set_mode((screen_width, screen_height))
+win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Chess')
 
-move_sound = pygame.mixer.Sound('sounds/move_sound.wav')
+move_sound = pygame.mixer.Sound(os.path.join('sounds', 'chess_move_sound.wav'))
+king_checked_sound = pygame.mixer.Sound(os.path.join('sounds', 'king_checked_sound.wav'))
 
 
 class Chess:
     def __init__(self, board):
         self.board_object = board
-        self.board = board.chess_board      # 2D table of figures
-        self.turn_color = 'white'           # white starts
+        self.board = board.chess_board  # 2D table of figures
+        self.turn_color = 'white'  # white starts
         self.first_click_x = -1
         self.first_click_y = -1
         self.new_x = -2
@@ -83,35 +85,45 @@ class Chess:
 
     def do_castling(self):
         if self.first_click_x + 2 == self.new_x:
-            self.board[self.first_click_y][self.first_click_x + 1] = self.board[self.first_click_y][self.first_click_x + 3]
+            self.board[self.first_click_y][self.first_click_x + 1] = self.board[self.first_click_y][
+                self.first_click_x + 3]
             self.board[self.first_click_y][self.first_click_x + 3] = 0
             self.board[self.first_click_y][self.first_click_x + 1].x = self.first_click_x + 1
             self.board[self.first_click_y][self.first_click_x + 1].y = self.first_click_y
 
         if self.first_click_x - 2 == self.new_x:
-            self.board[self.first_click_y][self.first_click_x - 1] = self.board[self.first_click_y][self.first_click_x - 4]
+            self.board[self.first_click_y][self.first_click_x - 1] = self.board[self.first_click_y][
+                self.first_click_x - 4]
             self.board[self.first_click_y][self.first_click_x - 4] = 0
             self.board[self.first_click_y][self.first_click_x - 1].x = self.first_click_x - 1
             self.board[self.first_click_y][self.first_click_x - 1].y = self.first_click_y
 
     """ handling pawn transition here """
 
-    @ staticmethod
+    @staticmethod
     def choose_pawn_transition_figure(x, y, color):
         change = True
         global run
 
         if color == 'white':
-            queen_button = FigureButton(x, y, cell_size, cell_size, 'img/' + str(color) + '_queen.png', (0, 0, 0))
-            rook_button = FigureButton(x, y + cell_size + 3, cell_size, cell_size, 'img/' + str(color) + '_rook.png', (0, 0, 0))
-            bishop_button = FigureButton(x, y + 2 * cell_size + 6, cell_size, cell_size, 'img/' + str(color) + '_bishop.png', (0, 0, 0))
-            horse_button = FigureButton(x, y + 3 * cell_size + 9, cell_size, cell_size, 'img/' + str(color) + '_horse.png', (0, 0, 0))
+            queen_button = FigureButton(x, y, CELL_SIZE, CELL_SIZE, os.path.join('img', str(color) + '_queen.png'),
+                                        (0, 0, 0))
+            rook_button = FigureButton(x, y + CELL_SIZE + 3, CELL_SIZE, CELL_SIZE,
+                                       os.path.join('img', str(color) + '_rook.png'), (0, 0, 0))
+            bishop_button = FigureButton(x, y + 2 * CELL_SIZE + 6, CELL_SIZE, CELL_SIZE,
+                                         os.path.join('img', str(color) + '_bishop.png'), (0, 0, 0))
+            horse_button = FigureButton(x, y + 3 * CELL_SIZE + 9, CELL_SIZE, CELL_SIZE,
+                                        os.path.join('img', str(color) + '_horse.png'), (0, 0, 0))
 
         else:
-            queen_button = FigureButton(x, y, cell_size, cell_size, 'img/' + str(color) + '_queen.png', (0, 0, 0))
-            rook_button = FigureButton(x, y - cell_size - 3, cell_size, cell_size, 'img/' + str(color) + '_rook.png', (0, 0, 0))
-            bishop_button = FigureButton(x, y - 2 * cell_size - 6, cell_size, cell_size, 'img/' + str(color) + '_bishop.png', (0, 0, 0))
-            horse_button = FigureButton(x, y - 3 * cell_size - 9, cell_size, cell_size, 'img/' + str(color) + '_horse.png', (0, 0, 0))
+            queen_button = FigureButton(x, y, CELL_SIZE, CELL_SIZE, os.path.join('img', str(color) + '_queen.png'),
+                                        (0, 0, 0))
+            rook_button = FigureButton(x, y - CELL_SIZE - 3, CELL_SIZE, CELL_SIZE,
+                                       os.path.join('img', str(color) + '_rook.png'), (0, 0, 0))
+            bishop_button = FigureButton(x, y - 2 * CELL_SIZE - 6, CELL_SIZE, CELL_SIZE,
+                                         os.path.join('img', str(color) + '_bishop.png'), (0, 0, 0))
+            horse_button = FigureButton(x, y - 3 * CELL_SIZE - 9, CELL_SIZE, CELL_SIZE,
+                                        os.path.join('img', str(color) + '_bishop.png'), (0, 0, 0))
 
         buttons = [queen_button, rook_button, bishop_button, horse_button]
 
@@ -135,9 +147,9 @@ class Chess:
                             return button.content
 
             if color == 'white':
-                pygame.draw.rect(win, (255, 255, 255), (x, y, cell_size, 4 * cell_size))
+                pygame.draw.rect(win, (255, 255, 255), (x, y, CELL_SIZE, 4 * CELL_SIZE))
             else:
-                pygame.draw.rect(win, (255, 255, 255), (x, y - 3 * cell_size, cell_size, 4 * cell_size))
+                pygame.draw.rect(win, (255, 255, 255), (x, y - 3 * CELL_SIZE, CELL_SIZE, 4 * CELL_SIZE))
 
             for button in buttons:
                 button.draw(win)
@@ -149,41 +161,44 @@ class Chess:
             for figure in row:
                 if figure:
                     if figure.is_moved:
+                        move_sound.play()
                         if figure.__repr__() == 'Pawn':
                             if figure.color == 'white':
                                 if figure.y == 0:
-                                    img = self.choose_pawn_transition_figure(figure.x * cell_size, figure.y * cell_size, figure.color)
-                                    if img == 'img/white_queen.png':
-                                        chosen_figure = Queen(figure.x, figure.y, cell_size, cell_size,
-                                                              'img/white_queen.png', 'white')
-                                    elif img == 'img/white_bishop.png':
-                                        chosen_figure = Bishop(figure.x, figure.y, cell_size, cell_size,
-                                                              'img/white_bishop.png', 'white')
-                                    elif img == 'img/white_rook.png':
-                                        chosen_figure = Rook(figure.x, figure.y, cell_size, cell_size,
-                                                              'img/white_rook.png', 'white')
+                                    img = self.choose_pawn_transition_figure(figure.x * CELL_SIZE, figure.y * CELL_SIZE,
+                                                                             figure.color)
+                                    if img == os.path.join('img', 'white_queen.png'):
+                                        chosen_figure = Queen(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                                                              os.path.join('img', 'white_queen.png'), 'white')
+                                    elif img == os.path.join('img', 'white_bishop.png'):
+                                        chosen_figure = Bishop(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                                                               os.path.join('img', 'white_bishop.png'), 'white')
+                                    elif img == os.path.join('img', 'white_rook.png'):
+                                        chosen_figure = Rook(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                                                             os.path.join('img', 'white_rook.png'), 'white')
                                     else:
-                                        chosen_figure = Horse(figure.x, figure.y, cell_size, cell_size,
-                                                              'img/white_horse.png', 'white')
+                                        chosen_figure = Horse(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                                                              os.path.join('img', 'white_horse.png'), 'white')
                                     chosen_figure.is_moved = True
                                     self.board[figure.y][figure.x] = chosen_figure
                                 else:
                                     self.board[figure.y][figure.x] = figure
                             if figure.color == 'black':
                                 if figure.y == 7:
-                                    img = self.choose_pawn_transition_figure(figure.x * cell_size, figure.y * cell_size, figure.color)
-                                    if img == 'img/black_queen.png':
-                                        chosen_figure = Queen(figure.x, figure.y, cell_size, cell_size,
-                                                              'img/black_queen.png', 'black')
-                                    elif img == 'img/black_bishop.png':
-                                        chosen_figure = Bishop(figure.x, figure.y, cell_size, cell_size,
-                                                              'img/black_bishop.png', 'black')
-                                    elif img == 'img/black_rook.png':
-                                        chosen_figure = Rook(figure.x, figure.y, cell_size, cell_size,
-                                                              'img/black_rook.png', 'black')
+                                    img = self.choose_pawn_transition_figure(figure.x * CELL_SIZE, figure.y * CELL_SIZE,
+                                                                             figure.color)
+                                    if img == os.path.join('img', 'black_queen.png'):
+                                        chosen_figure = Queen(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                                                              os.path.join('img', 'black_queen.png'), 'black')
+                                    elif img == os.path.join('img', 'black_bishop.png'):
+                                        chosen_figure = Bishop(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                                                               os.path.join('img', 'black_bishop.png'), 'black')
+                                    elif img == os.path.join('img', 'black_rook.png'):
+                                        chosen_figure = Rook(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                                                             os.path.join('img', 'black_rook.png'), 'black')
                                     else:
-                                        chosen_figure = Horse(figure.x, figure.y, cell_size, cell_size,
-                                                              'img/black_horse.png', 'black')
+                                        chosen_figure = Horse(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                                                              os.path.join('img', 'black_horse.png'), 'black')
                                     chosen_figure.is_moved = True
                                     self.board[figure.y][figure.x] = chosen_figure
                                 else:
@@ -209,15 +224,17 @@ class Chess:
     def draw(self, win):
         self.board_object.draw(win)
         if self.first_click_x != -1:
-            pygame.draw.rect(win, (255, 0, 0),
-                             (self.first_click_x * cell_size, self.first_click_y * cell_size, cell_size, cell_size), 2)
+            pygame.draw.rect(win, (0, 102, 0),
+                             (self.first_click_x * CELL_SIZE, self.first_click_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 4)
             figure = self.board[self.first_click_y][self.first_click_x]
             if figure:
                 for key in figure.valid_positions_dict:
                     position_list = figure.valid_positions_dict[key]
                     for position in position_list:
                         x, y = position[0], position[1]
-                        pygame.draw.circle(win, (255, 0, 0), (int(x*cell_size + cell_size//2), int(y*cell_size + cell_size//2)), 5)
+                        pygame.draw.circle(win, (0, 102, 0),
+                                           (int(x * CELL_SIZE + CELL_SIZE // 2), int(y * CELL_SIZE + CELL_SIZE // 2)),
+                                           8)
 
     def set_move_that_confirm_king_safety(self, first_click_x, first_click_y):
         first_x_temp, first_y_temp = first_click_x, first_click_y
@@ -311,13 +328,13 @@ class Chess:
                                     if not self.board[y - 1][x]:
                                         valid_path_list.append(position)
 
-                elif figure.__repr__() == 'Horse' or figure.__repr__() == 'King':
+                elif figure.__repr__() in ['Horse', 'King']:
                     if not self.board[y][x]:
                         valid_path_list.append(position)
                     elif self.board[y][x].color != color:
                         valid_path_list.append(position)
 
-                elif figure.__repr__() == 'Bishop' or figure.__repr__() == 'Rook' or figure.__repr__() == 'Queen':
+                elif figure.__repr__() in ['Bishop', 'Rook', 'Queen']:
                     if not self.board[y][x]:
                         valid_path_list.append(position)
                     else:
@@ -336,14 +353,20 @@ class Chess:
             for pos in list_pos:
                 if second_click_x == pos[0] and second_click_y == pos[1]:
                     return True
+        if self.is_check:
+            king_checked_sound.play()
+            king_x, king_y = self.get_my_king_pos()
+            pygame.draw.rect(win, (255, 0, 0), (king_x * CELL_SIZE, king_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 4)
+            pygame.display.update()
+            pygame.time.delay(1000)
         return False
 
     def move(self):
         keys = pygame.mouse.get_pressed()
         if keys[0]:
             x, y = pygame.mouse.get_pos()
-            x = int(x // cell_size)
-            y = int(y // cell_size)
+            x = int(x // CELL_SIZE)
+            y = int(y // CELL_SIZE)
             if self.board[y][x] and (x != self.new_x or y != self.new_y):
                 if self.board[y][x].color == self.turn_color:
                     self.first_click_x = x
@@ -382,7 +405,6 @@ class Chess:
                             self.do_castling()
 
                         figure.move(self.new_x, self.new_y)
-                        move_sound.play()
                         self.refresh_board()
                         self.is_check = False
                         self.check_path_dict = {}
@@ -391,8 +413,8 @@ class Chess:
 
     def get_my_king_pos(self):
         king_x, king_y = -1, -1
-        for row in range(rows):
-            for col in range(cols):
+        for row in range(ROWS):
+            for col in range(COLS):
                 figure = self.board[row][col]
                 if figure:
                     if figure.__repr__() == 'King':
@@ -424,8 +446,6 @@ class Chess:
             for figure in row:
                 if figure:
                     if figure.color == self.turn_color:
-                        # print('figure: ', figure)
-                        # print('valid dict: ', figure.valid_positions_dict)
                         for key in figure.valid_positions_dict:
                             if figure.valid_positions_dict[key]:
                                 return False
@@ -455,10 +475,11 @@ class Chess:
         font = pygame.font.SysFont('comicsans', 50)
         chess_game.refresh_board()
         text = font.render(chess_game.turn_color.upper() + ' WON !', 1, (255, 0, 0))
-        win.blit(text, (screen_width // 2 - text.get_width()//2, 100))
+        win.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 100))
 
-        play_again_button = EndGameButton(screen_width // 2 - 100, screen_height // 2 - 100, 200, 100, 'Play Again', (0, 128, 0))
-        exit_button = EndGameButton(screen_width // 2 - 100, screen_height // 2 + 50, 200, 100, 'Exit', (128, 0, 0))
+        play_again_button = EndGameButton(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 100, 200, 100, 'Play Again',
+                                          (0, 128, 0))
+        exit_button = EndGameButton(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 50, 200, 100, 'Exit', (128, 0, 0))
 
         while play:
             for event in pygame.event.get():
@@ -492,14 +513,14 @@ class Chess:
 
 
 def redraw_game_window(win):
-    win.fill((255, 255, 255))
+    win.fill((255, 255, 179))
     chess_game.draw(win)
     chess_game.move()
     pygame.display.update()
 
 
 run = True
-board = Board((122, 155, 122))
+board = Board((102, 51, 0))
 board.create_board()
 chess_game = Chess(board)
 
