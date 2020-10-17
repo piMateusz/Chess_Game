@@ -1,5 +1,5 @@
 from abc import ABC
-import pygame
+from constans.constans import IMAGES
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 640
@@ -9,16 +9,17 @@ CELL_SIZE = SCREEN_WIDTH/8   # 80
 
 
 class ChessPiece(ABC):
-    def __init__(self, x, y, width, height, img, color):
+    def __init__(self, x, y, width, height, img, color, score):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.image = pygame.image.load(img)
+        self.image = img
         self.color = color
         self.is_moved = False
         self.valid_positions_dict = {}
         self.was_moved = False
+        self.score = score
 
     # abstract method
     def valid_positions(self):
@@ -35,8 +36,8 @@ class ChessPiece(ABC):
             self.was_moved = True
 
     def draw(self, win):
-        win.blit(self.image, (self.x*CELL_SIZE + self.width // 2 - self.image.get_width() // 2,
-                              self.y*CELL_SIZE + self.height // 2 - self.image.get_height() // 2))
+        win.blit(IMAGES[self.image], (self.x*CELL_SIZE + self.width // 2 - IMAGES[self.image].get_width() // 2,
+                              self.y*CELL_SIZE + self.height // 2 - IMAGES[self.image].get_height() // 2))
 
 
 class Pawn(ChessPiece):
