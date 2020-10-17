@@ -1,11 +1,5 @@
 from abc import ABC
-from constans.constans import IMAGES
-
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 640
-ROWS = 8
-COLS = 8
-CELL_SIZE = SCREEN_WIDTH/8   # 80
+from constans.constans import IMAGES, ROWS, COLS, CELL_SIZE
 
 
 class ChessPiece(ABC):
@@ -36,8 +30,8 @@ class ChessPiece(ABC):
             self.was_moved = True
 
     def draw(self, win):
-        win.blit(IMAGES[self.image], (self.x*CELL_SIZE + self.width // 2 - IMAGES[self.image].get_width() // 2,
-                              self.y*CELL_SIZE + self.height // 2 - IMAGES[self.image].get_height() // 2))
+        win.blit(IMAGES[self.image], (self.x * CELL_SIZE + self.width // 2 - IMAGES[self.image].get_width() // 2,
+                                      self.y * CELL_SIZE + self.height // 2 - IMAGES[self.image].get_height() // 2))
 
 
 class Pawn(ChessPiece):

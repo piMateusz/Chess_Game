@@ -1,5 +1,4 @@
 from copy import deepcopy
-# import pygame
 
 
 def minimax(game, depth, max_player):
@@ -7,32 +6,32 @@ def minimax(game, depth, max_player):
         return game.calculate_score(), game.board
 
     if max_player:
-        maxEval = float('-inf')
+        max_eval = float('-inf')
         best_move = None
 
         all_games = get_all_games(game, "black")
-
         for game in all_games:
             game.turn_color = "white"
             evaluation = minimax(game, depth - 1, False)[0]
-            maxEval = max(maxEval, evaluation)
-            if maxEval == evaluation:
+            max_eval = max(max_eval, evaluation)
+            if max_eval == evaluation:
                 best_move = game
 
-        return maxEval, best_move
-    else:
-        minEval = float('inf')
-        best_move = None
-        all_games = get_all_games(game, "white")
+        return max_eval, best_move
 
+    else:
+        min_eval = float('inf')
+        best_move = None
+
+        all_games = get_all_games(game, "white")
         for game in all_games:
             game.turn_color = "black"
             evaluation = minimax(game, depth - 1, True)[0]
-            minEval = min(minEval, evaluation)
-            if minEval == evaluation:
+            min_eval = min(min_eval, evaluation)
+            if min_eval == evaluation:
                 best_move = game
 
-        return minEval, best_move
+        return min_eval, best_move
 
 
 def simulate_move(piece, move, board, possible_removal):
@@ -47,13 +46,14 @@ def simulate_move(piece, move, board, possible_removal):
 def get_all_games(game, color):
     games = []
 
-    # valid_moves - > dict {piece: all_possible_moves_positions}
+    # valid_moves - > dict {piece: [[ [x1, y1,], [x2, y2], ..., [xn, yn] ]]} where [xn, yn] is one possible move pos.
     valid_moves = game.get_all_valid_moves(color)
 
     for piece, direction in valid_moves.items():
         for moves_in_one_direction in direction:
             for move_position in moves_in_one_direction:
-                # draw_moves(game, board, piece)
+                # method which draws possible moves -> uncomment it to see all AI moves calculations
+                # draw_moves(game, game.board, piece)
                 temp_game = deepcopy(game)
                 temp_piece = deepcopy(piece)
                 possible_removal = temp_game.board_object.chess_board[move_position[1]][move_position[0]]

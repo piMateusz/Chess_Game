@@ -1,6 +1,21 @@
 import os
 import pygame
 
+
+""" SCREEN SETTINGS """
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 640
+ROWS = 8
+COLS = 8
+CELL_SIZE = SCREEN_WIDTH/8   # 80
+
+
+""" SOUND SETTINGS """
+MOVE_SOUND_PATH = os.path.join('sounds', 'chess_move_sound.wav')
+KING_CHECKED_SOUND_PATH = os.path.join('sounds', 'king_checked_sound.wav')
+
+
+""" IMAGES SETTING"""
 BLACK_PAWN_PATH = os.path.join('img', 'black_pawn.png')
 BLACK_HORSE_PATH = os.path.join('img', 'black_horse.png')
 BLACK_BISHOP_PATH = os.path.join('img', 'black_bishop.png')
@@ -29,3 +44,6 @@ IMAGES = {
     WHITE_QUEEN_PATH: pygame.image.load(WHITE_QUEEN_PATH),
     WHITE_KING_PATH: pygame.image.load(WHITE_KING_PATH)
 }
+
+
+""" BUTTONS SETTINGS """
