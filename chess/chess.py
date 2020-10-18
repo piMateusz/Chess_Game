@@ -3,9 +3,9 @@ from constants.constants import (BLACK_HORSE_PATH, BLACK_BISHOP_PATH, BLACK_ROOK
                                  WHITE_HORSE_PATH, WHITE_BISHOP_PATH, WHITE_ROOK_PATH, WHITE_QUEEN_PATH)
 from constants.constants import SCORE_BOARD_DICT
 from constants.constants import MOVE_SOUND_PATH, KING_CHECKED_SOUND_PATH
-from figures import Bishop, Rook, Queen, Horse
-from buttons import EndGameButton, FigureButton
-from board import Board
+from figures.figures import Bishop, Rook, Queen, Horse
+from buttons.buttons import EndGameButton, FigureButton
+from board.board import Board
 from minimax.algorithm import minimax
 from copy import deepcopy
 import pygame

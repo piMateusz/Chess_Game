@@ -1,7 +1,7 @@
 from constants.constants import (ROWS, COLS, CELL_SIZE, BLACK_PAWN_PATH, BLACK_HORSE_PATH, BLACK_BISHOP_PATH,
                                  BLACK_ROOK_PATH, BLACK_QUEEN_PATH, BLACK_KING_PATH, WHITE_PAWN_PATH, WHITE_HORSE_PATH,
                                  WHITE_BISHOP_PATH, WHITE_ROOK_PATH, WHITE_QUEEN_PATH, WHITE_KING_PATH)
-from figures import Pawn, Horse, Bishop, Queen, King, Rook
+from figures.figures import Pawn, Horse, Bishop, Queen, King, Rook
 import pygame
 import string
 
