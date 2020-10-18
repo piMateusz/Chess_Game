@@ -10,6 +10,8 @@ class Board:
     def __init__(self, color):
         self.color = color
         self.chess_board = [[0 for _ in range(ROWS)] for _ in range(COLS)]
+        self.enemy_previous_move = 0, 0
+        self.enemy_previous_position = 0, 0
 
     def __repr__(self):
         result = "\n"
@@ -70,6 +72,12 @@ class Board:
         number = 8
         letters = string.ascii_lowercase[:8]
         font = pygame.font.SysFont('comicsans', 20)
+        if self.enemy_previous_move:
+            if self.enemy_previous_position:
+                first_x, first_y = self.enemy_previous_position
+                second_x, second_y = self.enemy_previous_move
+                pygame.draw.rect(win, (255, 0, 255), (first_x * CELL_SIZE, first_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 4)
+                pygame.draw.rect(win, (255, 0, 255), (second_x * CELL_SIZE, second_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 4)
 
         for row in range(ROWS):
             for col in range(COLS):
@@ -111,10 +119,16 @@ class Board:
             self.chess_board[first_click_y][first_click_x + 1] = self.chess_board[first_click_y][
                 first_click_x + 3]
             self.chess_board[first_click_y][first_click_x + 3] = 0
-            self.chess_board[first_click_y][first_click_x + 1].move(first_click_x + 1, first_click_y)
+            rook = self.chess_board[first_click_y][first_click_x + 1]
+            rook.x = first_click_x + 1
+            rook.y = first_click_y
+            rook.was_moved = True
 
         if first_click_x - 2 == new_x:
             self.chess_board[first_click_y][first_click_x - 1] = self.chess_board[first_click_y][
                 first_click_x - 4]
             self.chess_board[first_click_y][first_click_x - 4] = 0
-            self.chess_board[first_click_y][first_click_x - 1].move(first_click_x - 1, first_click_y)
+            rook = self.chess_board[first_click_y][first_click_x - 1]
+            rook.x = first_click_x - 1
+            rook.y = first_click_y
+            rook.was_moved = True

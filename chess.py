@@ -96,8 +96,7 @@ class Chess:
 
     """ handling pawn transition here """
 
-    @staticmethod
-    def choose_pawn_transition_figure(win, x, y, color):
+    def choose_pawn_transition_figure(self, win, x, y, color):
         change = True
         global run
 
@@ -116,6 +115,7 @@ class Chess:
         buttons = [queen_button, rook_button, bishop_button, horse_button]
 
         while change:
+            self.draw(win)
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
 
@@ -171,31 +171,32 @@ class Chess:
                                     self.board[figure.y][figure.x] = chosen_figure
                                 else:
                                     self.board[figure.y][figure.x] = figure
-                            if figure.color == 'black':
-                                if figure.y == 7:
-                                    img = self.choose_pawn_transition_figure(win, figure.x * CELL_SIZE, figure.y * CELL_SIZE,
-                                                                             figure.color)
-                                    if img == BLACK_QUEEN_PATH:
-                                        chosen_figure = Queen(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
-                                                              BLACK_QUEEN_PATH, 'black', 90)
-                                    elif img == BLACK_BISHOP_PATH:
-                                        chosen_figure = Bishop(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
-                                                               BLACK_BISHOP_PATH, 'black', 30)
-                                    elif img == BLACK_ROOK_PATH:
-                                        chosen_figure = Rook(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
-                                                             BLACK_ROOK_PATH, 'black', 50)
-                                    else:
-                                        chosen_figure = Horse(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
-                                                              BLACK_HORSE_PATH, 'black', 30)
-                                    chosen_figure.is_moved = True
-                                    self.board[figure.y][figure.x] = chosen_figure
-                                else:
-                                    self.board[figure.y][figure.x] = figure
+                            # if figure.color == 'black':
+                            #     if figure.y == 7:
+                            #         img = self.choose_pawn_transition_figure(win, figure.x * CELL_SIZE, figure.y * CELL_SIZE,
+                            #                                                  figure.color)
+                            #         if img == BLACK_QUEEN_PATH:
+                            #             chosen_figure = Queen(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                            #                                   BLACK_QUEEN_PATH, 'black', 90)
+                            #         elif img == BLACK_BISHOP_PATH:
+                            #             chosen_figure = Bishop(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                            #                                    BLACK_BISHOP_PATH, 'black', 30)
+                            #         elif img == BLACK_ROOK_PATH:
+                            #             chosen_figure = Rook(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                            #                                  BLACK_ROOK_PATH, 'black', 50)
+                            #         else:
+                            #             chosen_figure = Horse(figure.x, figure.y, CELL_SIZE, CELL_SIZE,
+                            #                                   BLACK_HORSE_PATH, 'black', 30)
+                            #         chosen_figure.is_moved = True
+                            #         self.board[figure.y][figure.x] = chosen_figure
+                            #     else:
+                            #         self.board[figure.y][figure.x] = figure
                         else:
                             self.board[figure.y][figure.x] = figure
                         if self.turn_color == self.player_color:
                             self.board[self.first_click_y][self.first_click_x] = 0
                         self.change_turn()
+                        return figure.x, figure.y
 
     def change_turn(self):
         for row in self.board:
@@ -491,9 +492,25 @@ class Chess:
         return all_valid_positions
 
     def ai_move(self, win, game):
+        first_x, first_y = self.get_latest_ai_move(game)
         self.board_object = deepcopy(game.board_object)
         self.board = self.board_object.chess_board
-        self.refresh_board(win)
+        new_x, new_y = self.refresh_board(win)
+        self.board_object.enemy_previous_move = new_x, new_y
+        self.board_object.enemy_previous_position = first_x, first_y
+
+    def get_latest_ai_move(self, game):
+        changed_positions = []
+        for y in range(ROWS):
+            for x in range(COLS):
+                if str(self.board[y][x]) != str(game.board[y][x]):
+                    changed_positions.append((x, y))
+        if len(changed_positions) > 2:
+            return 4, 0
+        else:
+            for x, y in changed_positions:
+                if not game.board[y][x]:
+                    return x, y
 
     def reset_game(self):
         self.is_check = False
