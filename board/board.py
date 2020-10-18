@@ -21,6 +21,7 @@ class Board:
         return result
 
     def create_board(self):
+        self.enemy_previous_move = self.enemy_previous_position = 0
         for row in range(ROWS):
             for col in range(COLS):
                 if row == 1:

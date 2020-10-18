@@ -542,15 +542,15 @@ class Chess:
         play = True
         global run
 
-        if chess_game.turn_color == 'white':
-            chess_game.turn_color = 'black'
-        elif chess_game.turn_color == 'black':
-            chess_game.turn_color = 'white'
+        if self.turn_color == 'white':
+            self.turn_color = 'black'
+        elif self.turn_color == 'black':
+            self.turn_color = 'white'
 
         win.fill((255, 255, 255))
         font = pygame.font.SysFont('comicsans', 50)
-        chess_game.refresh_board(win)
-        text = font.render(chess_game.turn_color.upper() + ' WON !', 1, (255, 0, 0))
+        self.refresh_board(win)
+        text = font.render(self.turn_color.upper() + ' WON !', 1, (255, 0, 0))
         win.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 100))
 
         play_again_button = EndGameButton(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 100, 200, 100, 'Play Again',
@@ -588,34 +588,34 @@ class Chess:
             pygame.display.update()
 
 
-def redraw_game_window(win):
-    win.fill((255, 255, 179))
-    chess_game.move(win)
-    chess_game.draw(win)
-    pygame.display.update()
-
-
-run = True
-board = Board((102, 51, 0))
-board.create_board()
-chess_game = Chess(board)
-
-# mainloop
-
-while run:
-
-    redraw_game_window(WIN)
-
-    if chess_game.winner is None:
-        if chess_game.turn_color == chess_game.ai_color:
-            if chess_game.check_if_ai_checkmated(WIN):
-                chess_game.end_game(WIN)
-            else:
-                value, new_game = minimax(chess_game, 2, True)
-                chess_game.ai_move(WIN, new_game)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-
-pygame.quit()
+# def redraw_game_window(win):
+#     win.fill((255, 255, 179))
+#     chess_game.move(win)
+#     chess_game.draw(win)
+#     pygame.display.update()
+#
+#
+# run = True
+# board = Board((102, 51, 0))
+# board.create_board()
+# chess_game = Chess(board)
+#
+# # mainloop
+#
+# while run:
+#
+#     redraw_game_window(WIN)
+#
+#     if chess_game.winner is None:
+#         if chess_game.turn_color == chess_game.ai_color:
+#             if chess_game.check_if_ai_checkmated(WIN):
+#                 chess_game.end_game(WIN)
+#             else:
+#                 value, new_game = minimax(chess_game, 2, True)
+#                 chess_game.ai_move(WIN, new_game)
+#
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             run = False
+#
+# pygame.quit()
