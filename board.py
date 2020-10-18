@@ -1,6 +1,6 @@
-from constans.constans import (ROWS, COLS, CELL_SIZE, BLACK_PAWN_PATH, BLACK_HORSE_PATH, BLACK_BISHOP_PATH,
-                               BLACK_ROOK_PATH, BLACK_QUEEN_PATH, BLACK_KING_PATH, WHITE_PAWN_PATH, WHITE_HORSE_PATH,
-                               WHITE_BISHOP_PATH, WHITE_ROOK_PATH, WHITE_QUEEN_PATH, WHITE_KING_PATH)
+from constants.constants import (ROWS, COLS, CELL_SIZE, BLACK_PAWN_PATH, BLACK_HORSE_PATH, BLACK_BISHOP_PATH,
+                                 BLACK_ROOK_PATH, BLACK_QUEEN_PATH, BLACK_KING_PATH, WHITE_PAWN_PATH, WHITE_HORSE_PATH,
+                                 WHITE_BISHOP_PATH, WHITE_ROOK_PATH, WHITE_QUEEN_PATH, WHITE_KING_PATH)
 from figures import Pawn, Horse, Bishop, Queen, King, Rook
 import pygame
 import string
@@ -82,21 +82,24 @@ class Board:
                 if col == 0:
                     text = font.render(str(number), 1, (0, 0, 0))
                     number -= 1
-                    win.blit(text, (col*CELL_SIZE + 5, row*CELL_SIZE + 10))
+                    win.blit(text, (col * CELL_SIZE + 5, row * CELL_SIZE + 10))
                 if row == 7:
                     text = font.render(str(letters[col]), 1, (0, 0, 0))
-                    win.blit(text, (col*CELL_SIZE + CELL_SIZE - 10, row*CELL_SIZE + CELL_SIZE - 20))
+                    win.blit(text, (col * CELL_SIZE + CELL_SIZE - 10, row * CELL_SIZE + CELL_SIZE - 20))
                 if self.chess_board[row][col]:
                     self.chess_board[row][col].draw(win)
 
     def move(self, piece, x, y):
         self.chess_board[piece.y][piece.x] = piece
-        self.chess_board[piece.y][piece.x], self.chess_board[y][x] = self.chess_board[y][x], self.chess_board[piece.y][piece.x]
+        self.chess_board[piece.y][piece.x], self.chess_board[y][x] = self.chess_board[y][x], self.chess_board[piece.y][
+            piece.x]
         piece.move(x, y)
         # handling piece promotion for AI -> pawn is automatically promoted to queen
         if str(piece) == "Pawn":
             if piece.y == 7:
-                self.chess_board[y][x] = Queen(x, y, CELL_SIZE, CELL_SIZE, BLACK_QUEEN_PATH, 'black', 90)
+                queen = Queen(x, y, CELL_SIZE, CELL_SIZE, BLACK_QUEEN_PATH, 'black', 90)
+                queen.is_moved = True
+                self.chess_board[y][x] = queen
 
     def remove(self, possible_removal):
         self.chess_board[possible_removal.y][possible_removal.x] = 0

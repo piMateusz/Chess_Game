@@ -1,5 +1,5 @@
 from abc import ABC
-from constans.constans import IMAGES, ROWS, COLS, CELL_SIZE
+from constants.constants import IMAGES, ROWS, COLS, CELL_SIZE
 
 
 class ChessPiece(ABC):
