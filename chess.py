@@ -94,21 +94,6 @@ class Chess:
 
         return True
 
-    def do_castling(self):
-        if self.first_click_x + 2 == self.new_x:
-            self.board[self.first_click_y][self.first_click_x + 1] = self.board[self.first_click_y][
-                self.first_click_x + 3]
-            self.board[self.first_click_y][self.first_click_x + 3] = 0
-            self.board[self.first_click_y][self.first_click_x + 1].x = self.first_click_x + 1
-            self.board[self.first_click_y][self.first_click_x + 1].y = self.first_click_y
-
-        if self.first_click_x - 2 == self.new_x:
-            self.board[self.first_click_y][self.first_click_x - 1] = self.board[self.first_click_y][
-                self.first_click_x - 4]
-            self.board[self.first_click_y][self.first_click_x - 4] = 0
-            self.board[self.first_click_y][self.first_click_x - 1].x = self.first_click_x - 1
-            self.board[self.first_click_y][self.first_click_x - 1].y = self.first_click_y
-
     """ handling pawn transition here """
 
     @staticmethod
@@ -411,7 +396,7 @@ class Chess:
                     if self.new_x != -2:
                         if self.check_move_validity(win, self.first_click_x, self.first_click_y, self.new_x, self.new_y):
                             if str(figure) == 'King':
-                                self.do_castling()
+                                self.board_object.do_castling(self.first_click_x, self.first_click_y, self.new_x)
 
                             figure.move(self.new_x, self.new_y)
                             self.refresh_board(win)
@@ -492,10 +477,9 @@ class Chess:
                                 self.winner = self.turn_color
                         else:
                             self.set_move_that_confirm_king_safety(win, figure.x, figure.y)
-                        
-                        # TODO handle AI castling
-                        # self.check_for_possible_castling()
-                        
+
+                        self.check_for_possible_castling()
+
                         all_valid_positions[figure] = figure.valid_positions_dict.values()
                         all_valid_positions[figure] = [el for el in all_valid_positions[figure] if el]
                         if not all_valid_positions[figure]:

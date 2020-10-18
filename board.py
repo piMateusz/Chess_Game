@@ -91,8 +91,10 @@ class Board:
 
     def move(self, piece, x, y):
         self.chess_board[piece.y][piece.x] = piece
-        self.chess_board[piece.y][piece.x], self.chess_board[y][x] = self.chess_board[y][x], self.chess_board[piece.y][
-            piece.x]
+        if str(piece) == "King":
+            self.do_castling(piece.x, piece.y, x)
+        self.chess_board[piece.y][piece.x], self.chess_board[y][x] = self.chess_board[y][x], self.chess_board[piece.y][piece.x]
+
         piece.move(x, y)
         # handling piece promotion for AI -> pawn is automatically promoted to queen
         if str(piece) == "Pawn":
@@ -103,3 +105,16 @@ class Board:
 
     def remove(self, possible_removal):
         self.chess_board[possible_removal.y][possible_removal.x] = 0
+
+    def do_castling(self, first_click_x, first_click_y, new_x):
+        if first_click_x + 2 == new_x:
+            self.chess_board[first_click_y][first_click_x + 1] = self.chess_board[first_click_y][
+                first_click_x + 3]
+            self.chess_board[first_click_y][first_click_x + 3] = 0
+            self.chess_board[first_click_y][first_click_x + 1].move(first_click_x + 1, first_click_y)
+
+        if first_click_x - 2 == new_x:
+            self.chess_board[first_click_y][first_click_x - 1] = self.chess_board[first_click_y][
+                first_click_x - 4]
+            self.chess_board[first_click_y][first_click_x - 4] = 0
+            self.chess_board[first_click_y][first_click_x - 1].move(first_click_x - 1, first_click_y)
