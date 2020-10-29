@@ -17,7 +17,6 @@ KING_CHECKED_SOUND = pygame.mixer.Sound(KING_CHECKED_SOUND_PATH)
 
 WIN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Chess')
-RUN = True
 
 
 class Chess:
@@ -96,7 +95,6 @@ class Chess:
 
     def choose_pawn_transition_figure(self, win, x, y, color):
         change = True
-        global RUN
 
         if color == 'white':
             queen_button = FigureButton(x, y, CELL_SIZE, CELL_SIZE, WHITE_QUEEN_PATH, (0, 0, 0))
@@ -119,7 +117,6 @@ class Chess:
 
                 if event.type == pygame.QUIT:
                     change = False
-                    RUN = False
 
                 for button in buttons:
                     if button.is_over(pos):
@@ -353,6 +350,7 @@ class Chess:
         return False
 
     def move(self, win):
+        run = True
         if self.turn_color == self.player_color:
             keys = pygame.mouse.get_pressed()
             if keys[0]:
@@ -385,12 +383,12 @@ class Chess:
                                 self.when_checked(win, self.turn_color)
                                 if self.check_for_checkmate(self.turn_color):
                                     self.board_object.winner = self.ai_color
-                                    self.end_game(win)
+                                    run = self.end_game(win)
                             else:
                                 self.set_move_that_confirm_king_safety(win, self.first_click_x, self.first_click_y)
                                 if self.check_for_checkmate(self.turn_color):
                                     self.board_object.winner = "draw"
-                                    self.end_game(win)
+                                    run = self.end_game(win)
 
                             self.check_for_possible_castling()
                     else:
@@ -407,6 +405,7 @@ class Chess:
                             self.check_path_dict = {}
                         else:
                             self.new_x, self.new_y = -2, -2
+        return run
 
     def get_my_king_pos(self, color):
         king_x, king_y = -1, -1
@@ -557,7 +556,7 @@ class Chess:
 
     def end_game(self, win):
         play = True
-        global RUN
+        run = True
 
         if self.turn_color == 'white':
             self.turn_color = 'black'
@@ -583,7 +582,7 @@ class Chess:
 
                 if event.type == pygame.QUIT:
                     play = False
-                    RUN = False
+                    run = False
 
                 if play_again_button.is_over(pos):
                     play_again_button.color = (0, 255, 0)
@@ -601,9 +600,10 @@ class Chess:
                         play = False
                     if exit_button.is_over(pos):
                         play = False
-                        RUN = False
-                        print(f"pressed exit button, RUN = {RUN}")
+                        run = False
 
             play_again_button.draw(win)
             exit_button.draw(win)
             pygame.display.update()
+
+        return run
