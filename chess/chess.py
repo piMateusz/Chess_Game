@@ -5,8 +5,6 @@ from constants.constants import SCORE_BOARD_DICT
 from constants.constants import MOVE_SOUND_PATH, KING_CHECKED_SOUND_PATH
 from figures.figures import Bishop, Rook, Queen, Horse
 from buttons.buttons import EndGameButton, FigureButton
-from board.board import Board
-from minimax.algorithm import minimax
 from copy import deepcopy
 import pygame
 
@@ -19,6 +17,7 @@ KING_CHECKED_SOUND = pygame.mixer.Sound(KING_CHECKED_SOUND_PATH)
 
 WIN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Chess')
+RUN = True
 
 
 class Chess:
@@ -35,7 +34,6 @@ class Chess:
         self.check_path_dict = {}
         self.player_color = "white"
         self.ai_color = "black"
-        self.winner = None
 
     def __repr__(self):
         return str(self.board_object)
@@ -43,7 +41,7 @@ class Chess:
     """ handles castling """
 
     def check_for_possible_castling(self):
-        king_x, king_y = self.get_my_king_pos()
+        king_x, king_y = self.get_my_king_pos(self.turn_color)
         my_king = self.board[king_y][king_x]
 
         for key in my_king.valid_positions_dict:
@@ -98,7 +96,7 @@ class Chess:
 
     def choose_pawn_transition_figure(self, win, x, y, color):
         change = True
-        global run
+        global RUN
 
         if color == 'white':
             queen_button = FigureButton(x, y, CELL_SIZE, CELL_SIZE, WHITE_QUEEN_PATH, (0, 0, 0))
@@ -121,7 +119,7 @@ class Chess:
 
                 if event.type == pygame.QUIT:
                     change = False
-                    run = False
+                    RUN = False
 
                 for button in buttons:
                     if button.is_over(pos):
@@ -229,7 +227,7 @@ class Chess:
     def set_move_that_confirm_king_safety(self, win, first_click_x, first_click_y):
         first_x_temp, first_y_temp = first_click_x, first_click_y
         clicked_figure = self.board[first_click_y][first_click_x]
-        king_x, king_y = self.get_my_king_pos()
+        king_x, king_y = self.get_my_king_pos(self.turn_color)
         previous_figure = 0
         last_pos = []
         
@@ -245,7 +243,7 @@ class Chess:
                 self.board[new_y][new_x] = clicked_figure
                 first_click_x, first_click_y = new_x, new_y
                 if str(clicked_figure) == 'King':
-                    king_x, king_y = self.get_my_king_pos()
+                    king_x, king_y = self.get_my_king_pos(self.turn_color)
                     
                 for row in self.board:
                     for figure in row:
@@ -268,11 +266,11 @@ class Chess:
         if last_pos:
             self.board[last_pos[1]][last_pos[0]] = previous_figure
 
-    def when_checked(self, win):
+    def when_checked(self, win, color):
         for row in self.board:
             for figure in row:
                 if figure:
-                    if figure.color == self.turn_color:
+                    if figure.color == color:
                         for key in figure.valid_positions_dict:
                             position_list = figure.valid_positions_dict[key]
                             temp = position_list[:]
@@ -347,7 +345,7 @@ class Chess:
                     return True
         if self.is_check:
             KING_CHECKED_SOUND.play()
-            king_x, king_y = self.get_my_king_pos()
+            king_x, king_y = self.get_my_king_pos(self.turn_color)
             pygame.draw.rect(win, (255, 0, 0), (king_x * CELL_SIZE, king_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 4)
             self.draw(win)
             pygame.display.update()
@@ -381,15 +379,19 @@ class Chess:
                             self.first_click_x, self.first_click_y = -1, -1
                             self.new_x, self.new_y = -2, -2
                         else:
-                            self.check_for_check()
+                            self.check_for_check(self.turn_color)
                             self.set_move_validity(self.first_click_x, self.first_click_y, self.turn_color)
                             if self.is_check:
-                                self.when_checked(win)
-                                if self.check_for_checkmate():
-                                    self.winner = self.ai_color
+                                self.when_checked(win, self.turn_color)
+                                if self.check_for_checkmate(self.turn_color):
+                                    self.board_object.winner = self.ai_color
                                     self.end_game(win)
                             else:
                                 self.set_move_that_confirm_king_safety(win, self.first_click_x, self.first_click_y)
+                                if self.check_for_checkmate(self.turn_color):
+                                    self.board_object.winner = "draw"
+                                    self.end_game(win)
+
                             self.check_for_possible_castling()
                     else:
                         self.new_x, self.new_y = -2, -2
@@ -406,24 +408,24 @@ class Chess:
                         else:
                             self.new_x, self.new_y = -2, -2
 
-    def get_my_king_pos(self):
+    def get_my_king_pos(self, color):
         king_x, king_y = -1, -1
         for row in range(ROWS):
             for col in range(COLS):
                 figure = self.board[row][col]
                 if figure:
                     if str(figure) == 'King':
-                        if figure.color == self.turn_color:
+                        if figure.color == color:
                             king_x = col
                             king_y = row
         return king_x, king_y
 
-    def check_for_check(self):
-        my_king_x, my_king_y = self.get_my_king_pos()
+    def check_for_check(self, color):
+        my_king_x, my_king_y = self.get_my_king_pos(color)
         for row in self.board:
             for figure in row:
                 if figure:
-                    if figure.color != self.turn_color:
+                    if figure.color != color:
                         self.set_move_validity(figure.x, figure.y, figure.color)
                         for key in figure.valid_positions_dict:
                             pos_list = figure.valid_positions_dict[key]
@@ -436,14 +438,15 @@ class Chess:
                                             self.check_path_dict[key].append(check_path_position)
                                     self.is_check = True
 
-    def check_for_checkmate(self):
+    def check_for_checkmate(self, color):
         for row in self.board:
             for figure in row:
                 if figure:
-                    if figure.color == self.turn_color:
+                    if figure.color == color:
                         for key in figure.valid_positions_dict:
                             if figure.valid_positions_dict[key]:
                                 return False
+
         return True
 
     # calculates score for minimax algorithm
@@ -470,14 +473,18 @@ class Chess:
             for figure in row:
                 if figure != 0:
                     if figure.color == color:
-                        self.check_for_check()
+                        self.check_for_check(color)
                         self.set_move_validity(figure.x, figure.y, color)
                         if self.is_check:
-                            self.when_checked(win)
-                            if self.check_for_checkmate():
-                                self.winner = self.turn_color
+                            self.when_checked(win, color)
+                            if self.check_for_checkmate(color):
+                                self.board_object.winner = color
+                                # self.end_game(win)
                         else:
                             self.set_move_that_confirm_king_safety(win, figure.x, figure.y)
+                            if self.check_for_checkmate(color):
+                                self.board_object.winner = "draw"
+                                # self.end_game(win)
 
                         self.check_for_possible_castling()
 
@@ -492,12 +499,13 @@ class Chess:
         return all_valid_positions
 
     def ai_move(self, win, game):
-        first_x, first_y = self.get_latest_ai_move(game)
-        self.board_object = deepcopy(game.board_object)
-        self.board = self.board_object.chess_board
-        new_x, new_y = self.refresh_board(win)
-        self.board_object.enemy_previous_move = new_x, new_y
-        self.board_object.enemy_previous_position = first_x, first_y
+        if self.board_object.winner is None:
+            first_x, first_y = self.get_latest_ai_move(game)
+            self.board_object = deepcopy(game.board_object)
+            self.board = self.board_object.chess_board
+            new_x, new_y = self.refresh_board(win)
+            self.board_object.enemy_previous_move = new_x, new_y
+            self.board_object.enemy_previous_position = first_x, first_y
 
     def get_latest_ai_move(self, game):
         changed_positions = []
@@ -514,7 +522,6 @@ class Chess:
 
     def reset_game(self):
         self.is_check = False
-        self.winner = None
         self.turn_color = 'white'
         self.first_click_x = -1
         self.first_click_y = -1
@@ -522,25 +529,35 @@ class Chess:
         self.new_y = -2
         self.check_path_dict = {}
         self.board_object.create_board()
+        self.board_object.winner = None
         self.board = self.board_object.chess_board
 
-    def check_if_ai_checkmated(self, win):
+    def check_if_ai_checkmated_or_draw(self, win):
         for row in self.board:
             for figure in row:
                 if figure != 0:
                     if figure.color == self.ai_color:
-                        self.check_for_check()
+                        self.check_for_check(self.ai_color)
                         self.set_move_validity(figure.x, figure.y, figure.color)
                         if self.is_check:
-                            self.when_checked(win)
-                            if self.check_for_checkmate():
-                                self.winner = self.player_color
-                                return True
+                            self.when_checked(win, self.ai_color)
+                        else:
+                            self.set_move_that_confirm_king_safety(win, figure.x, figure.y)
+
+        if self.is_check:
+            if self.check_for_checkmate(self.ai_color):
+                self.board_object.winner = self.player_color
+                return True
+        else:
+            if self.check_for_checkmate(self.ai_color):
+                self.board_object.winner = "draw"
+                return True
+
         return False
 
     def end_game(self, win):
         play = True
-        global run
+        global RUN
 
         if self.turn_color == 'white':
             self.turn_color = 'black'
@@ -550,7 +567,10 @@ class Chess:
         win.fill((255, 255, 255))
         font = pygame.font.SysFont('comicsans', 50)
         self.refresh_board(win)
-        text = font.render(self.turn_color.upper() + ' WON !', 1, (255, 0, 0))
+        winner = self.board_object.winner.upper()
+        if self.board_object.winner != "draw":
+            winner += " WON"
+        text = font.render(winner, 1, (255, 0, 0))
         win.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 100))
 
         play_again_button = EndGameButton(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 100, 200, 100, 'Play Again',
@@ -563,7 +583,7 @@ class Chess:
 
                 if event.type == pygame.QUIT:
                     play = False
-                    run = False
+                    RUN = False
 
                 if play_again_button.is_over(pos):
                     play_again_button.color = (0, 255, 0)
@@ -581,41 +601,9 @@ class Chess:
                         play = False
                     if exit_button.is_over(pos):
                         play = False
-                        run = False
+                        RUN = False
+                        print(f"pressed exit button, RUN = {RUN}")
 
             play_again_button.draw(win)
             exit_button.draw(win)
             pygame.display.update()
-
-
-# def redraw_game_window(win):
-#     win.fill((255, 255, 179))
-#     chess_game.move(win)
-#     chess_game.draw(win)
-#     pygame.display.update()
-#
-#
-# run = True
-# board = Board((102, 51, 0))
-# board.create_board()
-# chess_game = Chess(board)
-#
-# # mainloop
-#
-# while run:
-#
-#     redraw_game_window(WIN)
-#
-#     if chess_game.winner is None:
-#         if chess_game.turn_color == chess_game.ai_color:
-#             if chess_game.check_if_ai_checkmated(WIN):
-#                 chess_game.end_game(WIN)
-#             else:
-#                 value, new_game = minimax(chess_game, 2, True)
-#                 chess_game.ai_move(WIN, new_game)
-#
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             run = False
-#
-# pygame.quit()

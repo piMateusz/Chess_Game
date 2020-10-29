@@ -12,6 +12,7 @@ class Board:
         self.chess_board = [[0 for _ in range(ROWS)] for _ in range(COLS)]
         self.enemy_previous_move = 0, 0
         self.enemy_previous_position = 0, 0
+        self.winner = None
 
     def __repr__(self):
         result = "\n"
