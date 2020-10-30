@@ -166,6 +166,7 @@ class Chess:
                                     self.board[figure.y][figure.x] = chosen_figure
                                 else:
                                     self.board[figure.y][figure.x] = figure
+
                             # if figure.color == 'black':
                             #     if figure.y == 7:
                             #         img = self.choose_pawn_transition_figure(win, figure.x * CELL_SIZE, figure.y * CELL_SIZE,
@@ -186,6 +187,7 @@ class Chess:
                             #         self.board[figure.y][figure.x] = chosen_figure
                             #     else:
                             #         self.board[figure.y][figure.x] = figure
+
                         else:
                             self.board[figure.y][figure.x] = figure
                         if self.turn_color == self.player_color:

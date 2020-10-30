@@ -2,6 +2,7 @@ from copy import deepcopy
 
 
 def minimax(game, depth, max_player):
+
     if depth == 0 or game.board_object.winner is not None:
         return game.calculate_score(), game
 
